@@ -22,7 +22,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/user")
+    @GetMapping("/")
     public ResponseEntity<User> getUserProfileInfo(Principal principal) {
         String userName = principal.getName();
         User user = userService.findByName(userName);

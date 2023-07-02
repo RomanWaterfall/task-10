@@ -27,7 +27,7 @@ public class AdminController {
         return userService.findByName(userName);
     }
 
-    @GetMapping("i/{id}")
+    @GetMapping("/{id}")
     public User getUserById(@PathVariable("id") Long id) {
         return userService.getUserById(id);
     }
