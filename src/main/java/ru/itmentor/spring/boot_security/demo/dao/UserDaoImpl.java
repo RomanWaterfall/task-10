@@ -1,10 +1,13 @@
 package ru.itmentor.spring.boot_security.demo.dao;
 
 import org.springframework.stereotype.Repository;
+import ru.itmentor.spring.boot_security.demo.entity.Role;
 import ru.itmentor.spring.boot_security.demo.entity.User;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.util.List;
 
 @Repository
@@ -20,7 +23,10 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public void saveUser(User user) {
-        entityManager.persist(user);
+        entityManager.merge(user);
+        for (Role role : user.getRoles()) {
+            entityManager.persist(role);
+        }
     }
 
     @Override
@@ -38,6 +44,10 @@ public class UserDaoImpl implements UserDao {
     public void updateUser(int id, User user) {
         entityManager.merge(user);
     }
+    @Override
+    public void updateRole(Role role) {
+        entityManager.merge(role);
+    }
 
 
     public User findByName(String name) {
@@ -45,5 +55,22 @@ public class UserDaoImpl implements UserDao {
         return entityManager.createQuery(query, User.class)
                 .setParameter("name", name)
                 .getSingleResult();
+    }
+
+    @Override
+    public void saveRole(Role role) {
+
+    }
+
+    @Override
+    public Role getRoleByName(String roleName) {
+        String queryString = "SELECT r FROM Role r WHERE r.name = :roleName";
+        TypedQuery<Role> query = entityManager.createQuery(queryString, Role.class);
+        query.setParameter("roleName", roleName);
+        try {
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null; // Если роль не найдена, возвращаем null или выбрасываем исключение, в зависимости от вашей логики обработки.
+        }
     }
 }

@@ -1,7 +1,5 @@
 package ru.itmentor.spring.boot_security.demo.service;
-
 import ru.itmentor.spring.boot_security.demo.entity.User;
-
 import java.util.List;
 
 public interface UserService {
@@ -16,6 +14,4 @@ public interface UserService {
     void updateUser(int id, User user);
 
     User findByName(String username);
-
-
 }

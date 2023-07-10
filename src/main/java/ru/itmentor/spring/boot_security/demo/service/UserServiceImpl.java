@@ -7,9 +7,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itmentor.spring.boot_security.demo.dao.UserDao;
+import ru.itmentor.spring.boot_security.demo.entity.Role;
 import ru.itmentor.spring.boot_security.demo.entity.User;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 @Service
 public class UserServiceImpl implements UserService, UserDetailsService {
@@ -29,8 +33,23 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     @Transactional
     public void saveUser(User user) {
+        Set<Role> roles = new HashSet<>();
+        user.getRoles().stream().forEach(
+                role ->
+                        roles.add(
+                                userDao.getRoleByName(role.getName())));
+//        Role userRole = userDao.getRoleByName("ROLE_USER");
+//        Role adminRole = userDao.getRoleByName("ROLE_ADMIN");
+//
+//        roles.add(userRole);
+//        roles.add(adminRole);
+//
+        user.setRoles(roles);
         userDao.saveUser(user);
     }
+//    public void saveUser(User user) {
+//        userDao.saveUser(user);
+//    }
 
     @Override
     @Transactional
@@ -49,11 +68,40 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userDao.findByName(username);
     }
 
+
     @Override
     @Transactional
-    public void updateUser(int id, User user) {
-        userDao.updateUser(id, user);
+    public void updateUser(int id, User updatedUser) {
+        User user = userDao.getUserById((long) id);
+        if (user != null) {
+            // Получаем список текущих ролей пользователя
+            Set<Role> currentRoles = user.getRoles();
+
+            // Удаляем все текущие роли пользователя
+            currentRoles.clear();
+
+            // Создаем и сохраняем новые роли пользователя
+            for (Role role : updatedUser.getRoles()) {
+                // Выполняем сохранение роли без использования EntityManager
+//                userDao.saveRole(role);
+                // Привязываем роль к пользователю
+                currentRoles.add(userDao.getRoleByName(role.getName()));
+            }
+
+            // Обновляем остальные поля пользователя
+            user.setName(updatedUser.getName());
+            user.setSurname(updatedUser.getSurname());
+            user.setAge(updatedUser.getAge());
+            user.setSalary(updatedUser.getSalary());
+            user.setPassword(updatedUser.getPassword());
+
+            // Обновляем пользователя в базе данных
+            userDao.updateUser(id, user);
+        } else {
+            throw new NoSuchElementException("User not found");
+        }
     }
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -65,6 +113,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
 }
+
+
+
 
 
 

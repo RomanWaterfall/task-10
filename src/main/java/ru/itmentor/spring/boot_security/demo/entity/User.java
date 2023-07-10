@@ -1,7 +1,5 @@
 package ru.itmentor.spring.boot_security.demo.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -31,19 +29,20 @@ public class User implements UserDetails {
 
     @Column(name = "salary")
     private Long salary;
-    @JsonManagedReference
+
     @ManyToMany
     @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "users_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    @JsonIgnore
+
     private Set<Role> roles;
 
     public Set<Role> getRoles() {
+
         return roles;
     }
 
-    @JsonIgnore
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles;

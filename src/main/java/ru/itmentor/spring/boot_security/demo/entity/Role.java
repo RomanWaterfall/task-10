@@ -18,15 +18,20 @@ public class Role implements GrantedAuthority {
     @Column(name = "name")
     private String name;
 
-    public Role(Long id, String name, Set<User> users) {
+    public Role(String name) {
         this.id = id;
         this.name = name;
         this.users = users;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public Role() {
 
     }
+
 
     public String getName() {
         return name;
@@ -46,6 +51,7 @@ public class Role implements GrantedAuthority {
     private Set<User> users;
 
 }
+
 
 
 
